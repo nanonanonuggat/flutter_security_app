@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import '../constants/app_colors.dart';
 
 class CustomInput extends StatelessWidget {
@@ -9,6 +11,10 @@ class CustomInput extends StatelessWidget {
   final bool isPassword;
   final TextInputType keyboardType;
   final TextEditingController? controller;
+  final List<TextInputFormatter>? inputFormatters;
+  final int? maxLength;
+  final bool autocorrect;
+  final bool enableSuggestions;
 
   const CustomInput({
     super.key,
@@ -19,6 +25,10 @@ class CustomInput extends StatelessWidget {
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
     this.controller,
+    this.inputFormatters,
+    this.maxLength,
+    this.autocorrect = false,
+    this.enableSuggestions = false,
   });
 
   @override
@@ -39,11 +49,16 @@ class CustomInput extends StatelessWidget {
           controller: controller,
           obscureText: isPassword,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
+          maxLength: maxLength,
+          autocorrect: !isPassword && autocorrect,
+          enableSuggestions: !isPassword && enableSuggestions,
           style: const TextStyle(color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
             filled: true,
+            counterText: '',
             fillColor: AppColors.cardWhite,
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
