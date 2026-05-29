@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/session_timeout_service.dart';
 
+final RouteObserver<ModalRoute<void>> appRouteObserver =
+    RouteObserver<ModalRoute<void>>();
+
 class SessionGuard extends StatefulWidget {
   final Widget child;
   final Future<void> Function() onSessionExpired;
@@ -20,8 +23,10 @@ class SessionGuard extends StatefulWidget {
 }
 
 class _SessionGuardState extends State<SessionGuard>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, RouteAware {
   bool _handlingExpiry = false;
+  final Object _ownerId = Object();
+  ModalRoute<void>? _route;
 
   @override
   void initState() {
@@ -32,8 +37,11 @@ class _SessionGuardState extends State<SessionGuard>
 
   @override
   void dispose() {
+    if (_route != null) {
+      appRouteObserver.unsubscribe(this);
+    }
     WidgetsBinding.instance.removeObserver(this);
-    SessionTimeoutService.instance.stop();
+    SessionTimeoutService.instance.stop(ownerId: _ownerId);
     super.dispose();
   }
 
@@ -42,6 +50,29 @@ class _SessionGuardState extends State<SessionGuard>
     if (state == AppLifecycleState.resumed) {
       _validateSession();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final nextRoute = ModalRoute.of(context);
+    if (nextRoute is PageRoute && nextRoute != _route) {
+      if (_route != null) {
+        appRouteObserver.unsubscribe(this);
+      }
+      _route = nextRoute;
+      appRouteObserver.subscribe(this, nextRoute);
+    }
+  }
+
+  @override
+  void didPush() {
+    _resetTimer();
+  }
+
+  @override
+  void didPopNext() {
+    _resetTimer();
   }
 
   Future<void> _validateSession() async {
@@ -64,6 +95,7 @@ class _SessionGuardState extends State<SessionGuard>
   void _resetTimer() {
     unawaited(AuthService.instance.touchSession());
     SessionTimeoutService.instance.reset(
+      ownerId: _ownerId,
       timeout: AuthService.sessionTimeout,
       onTimeout: () async {
         await AuthService.instance.clearSession();
@@ -74,9 +106,10 @@ class _SessionGuardState extends State<SessionGuard>
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
+    return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onPointerDown: (_) => _resetTimer(),
+      onTap: _resetTimer,
+      onPanDown: (_) => _resetTimer(),
       child: widget.child,
     );
   }

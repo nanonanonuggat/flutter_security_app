@@ -93,7 +93,7 @@ class AuthService {
 
   static final AuthService instance = AuthService._();
 
-  static const Duration sessionTimeout = Duration(minutes: 9);
+  static const Duration sessionTimeout = Duration(seconds: 20);
   static const int maxLoginAttempts = 5;
   static const Duration dailyLockDuration = Duration(hours: 24);
   static const String defaultPin = '123456';

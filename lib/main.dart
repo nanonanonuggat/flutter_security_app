@@ -5,6 +5,7 @@ import 'core/services/app_security_service.dart';
 import 'core/services/auth_service.dart';
 import 'core/themes/app_theme.dart';
 import 'core/widgets/security_blocked_screen.dart';
+import 'core/widgets/session_guard.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/login/login_screen.dart';
 
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Security App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      navigatorObservers: [appRouteObserver],
       home: const _AppGate(),
     );
   }

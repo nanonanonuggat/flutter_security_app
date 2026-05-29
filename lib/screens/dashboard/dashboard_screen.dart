@@ -9,6 +9,8 @@ import '../../core/widgets/section_title.dart';
 import '../../core/widgets/session_guard.dart';
 import '../../core/widgets/transaction_tile.dart';
 import '../../models/transaction_model.dart';
+import '../bills/bills_screen.dart';
+import '../gov_pay/gov_pay_screen.dart';
 import '../history/transaction_history_screen.dart';
 import '../login/login_screen.dart';
 import '../transfer/transfer_screen.dart';
@@ -131,13 +133,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           context,
                           Icons.account_balance,
                           'Gov Pay',
-                          () {},
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const GovPayScreen(),
+                              ),
+                            );
+                          },
                         ),
                         _buildActionItem(
                           context,
                           Icons.receipt_long,
                           'Bills',
-                          () {},
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const BillsScreen(),
+                              ),
+                            );
+                          },
                         ),
                         _buildActionItem(
                           context,
